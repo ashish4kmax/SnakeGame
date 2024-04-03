@@ -100,6 +100,31 @@
             .my-element {
                 font-size: 10px;
             }
+
+            /* Adjust canvas container width for screens less than 426px wide */
+            #canvas-container {
+                margin-left: 7%;
+                width: 85%;
+                /* Adjust the width as needed */
+                padding: 10px;
+                /* Add padding */
+                box-sizing: border-box;
+                /* Include padding in the width calculation */
+            }
+
+            /* Adjust canvas size for mobile devices */
+            canvas {
+                width: 100%;
+                /* Make canvas width 100% of its container */
+                height: auto;
+                /* Let the height adjust automatically */
+            }
+
+            #score {
+                font-size: 20px;
+                text-align: center;
+                /* Center align the score */
+            }
         }
 
 
