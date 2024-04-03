@@ -54,78 +54,29 @@
             cursor: pointer;
         }
 
-        @media only screen and (max-width: 375px) {
-
-            /* Adjust canvas size for mobile devices */
-            canvas {
-                height: 325px;
-                /* Set custom height for mobile */
-                margin-left: 15px;
-            }
-
-            #score {
-                font-size: 20px;
-                margin-left: -5px;
-            }
+        #game-instructions {
+            position: absolute;
+            top: 20px;
+            left: 20px;
+            background-color: rgba(255, 255, 255, 0.8);
+            padding: 5px;
+            border-radius: 7px;
+            box-shadow: 0px 0px 10px rgba(0, 0, 0, 0.5);
         }
 
-        @media only screen and (max-width: 320px) {
-
-            /* Adjust canvas size for mobile devices */
-            canvas {
-                height: 120px;
-                /* Set custom height for mobile */
-                margin-left: 6px;
-            }
-
-            #score {
-                font-size: 10px;
-                margin-left: -175px;
-            }
+        #game-instructions h3 {
+            margin-top: 0;
         }
 
-        @media only screen and (max-width: 425px) {
-
-            /* Hide snake image for screens less than 426px wide */
-            img.snake-image {
-                display: none;
-            }
-
-            h1 {
-                font-size: 70px;
-                margin-top: 50px;
-                /* Adjust the margin for the heading */
-            }
-
-            .my-element {
-                font-size: 10px;
-            }
-
-            /* Adjust canvas container width for screens less than 426px wide */
-            #canvas-container {
-                margin-left: 7%;
-                width: 85%;
-                /* Adjust the width as needed */
-                padding: 10px;
-                /* Add padding */
-                box-sizing: border-box;
-                /* Include padding in the width calculation */
-            }
-
-            /* Adjust canvas size for mobile devices */
-            canvas {
-                width: 100%;
-                /* Make canvas width 100% of its container */
-                height: auto;
-                /* Let the height adjust automatically */
-            }
-
-            #score {
-                font-size: 20px;
-                text-align: center;
-                /* Center align the score */
-            }
+        #game-instructions ul {
+            list-style-type: none;
+            padding-left: 0;
         }
+
+        #game-instructions li {
+            margin-bottom: 5px;
+        }
+
 
 
         @keyframes bounce {
@@ -185,6 +136,124 @@
             /* don't forget to set a duration! */
         }
 
+        @media only screen and (max-width: 375px) {
+
+            /* Adjust canvas size for mobile devices */
+            canvas {
+                height: 325px;
+                /* Set custom height for mobile */
+                margin-left: 15px;
+            }
+
+            #score {
+                font-size: 20px;
+                margin-left: -5px;
+            }
+        }
+
+        @media only screen and (max-width: 320px) {
+
+            /* Adjust canvas size for mobile devices */
+            canvas {
+                height: 120px;
+                /* Set custom height for mobile */
+                margin-left: 6px;
+            }
+
+            #score {
+                font-size: 10px;
+                margin-left: -175px;
+            }
+        }
+
+        @media only screen and (max-width: 425px) {
+
+            /* Hide snake image for screens less than 426px wide */
+            img.snake-image {
+                display: none;
+            }
+
+            h1 {
+                font-size: 70px;
+                margin-top: 12px;
+                /* Adjust the margin for the heading */
+                margin-bottom: 50px;
+            }
+
+            .my-element {
+                font-size: 10px;
+            }
+
+            /* Adjust canvas container width for screens less than 426px wide */
+            #canvas-container {
+                margin-left: 7%;
+                width: 85%;
+                /* Adjust the width as needed */
+                padding: 10px;
+                /* Add padding */
+                box-sizing: border-box;
+                /* Include padding in the width calculation */
+            }
+
+            /* Adjust canvas size for mobile devices */
+            canvas {
+                width: 100%;
+                /* Make canvas width 100% of its container */
+                height: auto;
+                /* Let the height adjust automatically */
+            }
+
+            #score {
+                font-size: 20px;
+                text-align: center;
+                /* Center align the score */
+            }
+
+            /* Add margin-top and adjust font-size for the speed levels */
+            #speed-levels {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                gap: 15px;
+                /* Add margin-top */
+                margin-top: 20px;
+                margin-bottom: 2%;
+            }
+
+            #speed-levels>button {
+                font-size: 16px;
+                /* Adjust font-size */
+            }
+
+            #game-instructions {
+                margin-top: 50px;
+                /* Add padding to provide space around the content */
+            }
+
+            #GI {
+                text-align: center;
+                /* Add margin to the left */
+                margin-top: 20px;
+                /* Add margin to the top */
+                font-size: 25px;
+            }
+
+            #PC {
+                display: none;
+            }
+
+            #MOBILE,
+            #LVL {
+                text-align: center;
+                margin-top: 18px;
+                /* Add margin between the sections */
+            }
+
+            .my-element {
+                font-size: 20px;
+            }
+        }
+
         @media only screen and (max-width: 768px) {
             .leaderboard {
                 display: flex;
@@ -212,6 +281,35 @@
             ol#leaderboardList li {
                 margin-bottom: 5px;
             }
+
+            #game-instructions {
+                top: 0;
+                left: 0;
+                right: 0;
+                margin: auto;
+                position: static;
+                padding: 15px;
+                background-color: rgb(23, 17, 26);
+            }
+
+            #GI {
+                text-align: center;
+                /* Add margin to the left */
+                margin-top: 20px;
+                /* Add margin to the top */
+                font-size: 25px;
+            }
+
+            #PC {
+                display: none;
+            }
+
+            #MOBILE,
+            #LVL {
+                text-align: center;
+                margin-top: 18px;
+                /* Add margin between the sections */
+            }
         }
 
 
@@ -223,6 +321,23 @@
             margin-bottom: 10px;
             /* Adjust the margin bottom as needed */
         }
+
+        #speed-levels {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 30px;
+        }
+
+        #speed-levels>button {
+            margin-top: 1.5%;
+            font-size: 20px;
+            margin-bottom: 1.2%;
+        }
+
+        footer {
+            margin-top: 3.6%;
+        }
     </style>
 </head>
 
@@ -232,10 +347,46 @@
         <h1>Snake Game</h1>
         <img class="snake-image" src="./images/snake.gif" alt="snake_animated">
     </div>
+
+    <!-- Game Instructions -->
+    <div id="game-instructions">
+        <h3 id="GI">Game Instructions</h3>
+        <div id="PC">
+            <p>PC Controls:</p>
+            <ul>
+                <li>Use <strong>arrow keys</strong> to move the snake.</li>
+            </ul>
+        </div>
+        <div id="MOBILE">
+            <p>Mobile Controls:</p>
+            <ul>
+                <li>Swipe <strong>up</strong>, <strong>down</strong>, <strong>left</strong>, or <strong>right</strong>
+                    to
+                    move
+                    the snake.</li>
+            </ul>
+        </div>
+        <div id="LVL">
+            <p>Level Selection:</p>
+            <ul>
+                <li>Click on the <strong>Level 1</strong>, <strong>Level 2</strong>, or <strong>Level 3</strong> buttons
+                    to
+                    adjust the speed.</li>
+            </ul>
+        </div>
+    </div>
+
+
     <br />
     <br />
     <br />
     <h3 class="my-element" id="start-msg">Click on the box to start playing!!</h3>
+    <div id="speed-levels">
+        <button onclick="setSpeed(150)" class="button-73">Level 1</button>
+        <button onclick="setSpeed(100)" class="button-73">Level 2</button>
+        <button onclick="setSpeed(50)" class="button-73">Level 3</button>
+    </div>
+
     <div id="player-input">
         <input type="text" id="playerName" placeholder="Enter your name">
         <button onclick="savePlayerData()" class="button-73">Submit</button>
@@ -259,14 +410,6 @@
         <ol id="leaderboardList"></ol>
     </div>
 
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
-    <br />
     <footer>
         <div class='cr-con'><a href="https://github.com/ashish4kmax">Copyright &copy; 2024 | Made by Ashish</a></div>
     </footer>
@@ -274,13 +417,18 @@
 
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1204.0.min.js"></script>
     <script>
-
         // Initialize AWS DynamoDB client
         AWS.config.update({
             region: 'us-east-1', // Update with your AWS region
             accessKeyId: 'AKIAQHEPT6D464V24Y5E', // Update with your AWS access key ID
             secretAccessKey: '5JFXbFuU8QEHcBnTHlLLkxwmfYQVcHi6JUU7TAyW' // Update with your AWS secret access key
         });
+
+        let speed = 100;
+
+        function setSpeed(speeds) {
+            speed = speeds;
+        }
 
         const docClient = new AWS.DynamoDB.DocumentClient();
 
@@ -427,7 +575,7 @@
         // Start the game when canvas is clicked
         canvas.addEventListener('click', function () {
             init(); // Initialize game
-            gameLoop = setInterval(draw, 100); // Start game loop
+            gameLoop = setInterval(draw, speed); // Start game loop
         });
 
         // Swipe controls for touch devices
@@ -512,7 +660,7 @@
             // Show restart button
             document.getElementById('restart-button').addEventListener('click', function () {
                 init(); // Restart the game
-                gameLoop = setInterval(draw, 100); // Start game loop again
+                gameLoop = setInterval(draw, speed); // Start game loop again
             });
 
         }
