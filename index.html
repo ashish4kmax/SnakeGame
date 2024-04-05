@@ -314,7 +314,7 @@
 
 
         #player-input {
-            display: none;
+            display: flex;
         }
 
         ol#leaderboardList li {
@@ -400,7 +400,7 @@
         <br />
     </div>
     <div id="score"></div>
-    <button id="restart-button" onclick="alerts()">Restart</button>
+    <button id="restart-button" onclick="restart()">Restart</button>
 
 
     <!-- Snake Leaderboard -->
@@ -414,7 +414,6 @@
         <div class='cr-con'><a href="https://github.com/ashish4kmax">Copyright &copy; 2024 | Made by Ashish</a></div>
     </footer>
 
-
     <script src="https://sdk.amazonaws.com/js/aws-sdk-2.1204.0.min.js"></script>
     <script>
         // Initialize AWS DynamoDB client
@@ -422,8 +421,9 @@
             region: 'us-east-1', // Update with your AWS region
             accessKeyId: 'AKIAQHEPT6D464V24Y5E', // Update with your AWS access key ID
             secretAccessKey: '5JFXbFuU8QEHcBnTHlLLkxwmfYQVcHi6JUU7TAyW' // Update with your AWS secret access key
-        });
+        })
 
+        let gameOverFlag = false; // Add a flag to track whether the game is over or not
         let speed = 100;
 
         function setSpeed(speeds) {
@@ -495,7 +495,6 @@
             return false;
         }
 
-
         function draw() {
             ctx.clearRect(0, 0, canvas.width, canvas.height);
             ctx.fillStyle = 'red';
@@ -517,17 +516,14 @@
 
             switch (d) {
                 case 'LEFT':
-                    // Check if going beyond left boundary
                     if (snakeX - box < 0) {
-                        // If collision, trigger game over
                         gameOver();
-                        return;  // Exit the function if game over
+                        return;
                     } else {
                         snakeX -= box;
                     }
                     break;
                 case 'UP':
-                    // Check if going beyond top boundary
                     if (snakeY - box < 0) {
                         gameOver();
                         return;
@@ -536,20 +532,37 @@
                     }
                     break;
                 case 'RIGHT':
-                    snakeX += box;
+                    if (snakeX + box >= canvas.width) {
+                        gameOver();
+                        return;
+                    } else {
+                        snakeX += box;
+                    }
                     break;
                 case 'DOWN':
-                    snakeY += box;
+                    if (snakeY + box >= canvas.height) {
+                        gameOver();
+                        return;
+                    } else {
+                        snakeY += box;
+                    }
                     break;
             }
 
+            // Check if the snake's head collides with its own body
+            for (let i = 1; i < snake.length; i++) {
+                if (snakeX === snake[i].x && snakeY === snake[i].y) {
+                    gameOver();
+                    return;
+                }
+            }
+
             if (snakeX === food.x && snakeY === food.y) {
-                score += box; // Increase score by box length
+                score += box;
                 food = {
                     x: Math.floor(Math.random() * 20) * box,
                     y: Math.floor(Math.random() * 20) * box
                 };
-                // Dynamically update score
                 document.getElementById('score').innerText = `Score: ${score / 20}`;
             } else {
                 snake.pop();
@@ -560,22 +573,20 @@
                 y: snakeY
             };
 
-            if (snakeX < 0 || snakeX >= canvas.width || snakeY < 0 || snakeY >= canvas.height || collision(newHead, snake)) {
-                // Display alert when collision occurs
-                document.getElementById("player-input").style.display = "flex";
-                clearInterval(gameLoop);
-                // Display final score at the bottom
-                document.getElementById('score').innerText = `Score: ${score / 20}`;
-                document.getElementById('restart-button').style.display = "flex";
-            }
-
             snake.unshift(newHead);
         }
 
         // Start the game when canvas is clicked
         canvas.addEventListener('click', function () {
-            init(); // Initialize game
-            gameLoop = setInterval(draw, speed); // Start game loop
+            const playerName = document.getElementById("playerName").value.trim();
+            if (playerName === '') {
+                alert("Please enter your name!");
+                return;
+            } else {
+                init(); // Initialize game
+                gameLoop = setInterval(draw, speed); // Start game loop
+                gameOverFlag = true; // Set the flag to true indicating the game is ongoing
+            }
         });
 
         // Swipe controls for touch devices
@@ -595,7 +606,6 @@
             handleSwipe(startX, startY, endX, endY);
         });
 
-
         canvas.addEventListener('touchend', function (e) {
             const endX = e.changedTouches[0].clientX;
             const endY = e.changedTouches[0].clientY;
@@ -605,12 +615,16 @@
         // Keyboard controls for desktop
         document.addEventListener('keydown', direction);
 
+        // database part
         // Modify the gameOver function to show the restart button
         function gameOver() {
             clearInterval(gameLoop);
             // Display final score
             const finalScore = score / 20;
             document.getElementById('score').innerText = `Score: ${finalScore}`;
+            // Show restart button
+            document.getElementById('restart-button').style.display = 'flex';
+
             // Update player score in the leaderboard
             const playerName = document.getElementById('playerName').value.trim();
             if (playerName !== '') {
@@ -632,78 +646,53 @@
                     if (data.Items.length > 0) {
                         // Update the player's score if found
                         const playerId = data.Items[0].playerId;
-                        const playerScore = finalScore;
+                        const prevScore = data.Items[0].playerScore;
+                        const newScore = finalScore;
 
-                        const updateParams = {
+                        if (newScore > prevScore) {
+                            const updateParams = {
+                                TableName: 'SnakeLeaderboard',
+                                Key: {
+                                    playerId: playerId
+                                },
+                                UpdateExpression: 'set playerScore = :score',
+                                ExpressionAttributeValues: {
+                                    ':score': newScore
+                                }
+                            };
+
+                            docClient.update(updateParams, function (err, data) {
+                                if (!err) {
+                                    alert("Player score updated successfully", data);
+                                    // Refresh leaderboard after updating player score
+                                    refreshLeaderboard();
+                                }
+                            });
+                        }
+                    } else {
+                        // Player not found, insert a new player
+                        const newPlayerScore = finalScore;
+                        const newPlayerParams = {
                             TableName: 'SnakeLeaderboard',
-                            Key: {
-                                playerId: playerId
-                            },
-                            UpdateExpression: 'set playerScore = :score',
-                            ExpressionAttributeValues: {
-                                ':score': playerScore
+                            Item: {
+                                playerId: data.Items.length + 1, // Generate sequential player ID
+                                playerName: playerName,
+                                playerScore: newPlayerScore
                             }
                         };
 
-                        docClient.update(updateParams, function (err, data) {
+                        docClient.put(newPlayerParams, function (err, data) {
                             if (err) {
-                                alert("Error updating player score", err);
+                                alert("Error adding new player", err);
                             } else {
-                                alert("Player score updated successfully", data);
-                                // Refresh leaderboard after updating player score
+                                alert("New player added successfully", data);
+                                // Refresh leaderboard after adding new player
                                 refreshLeaderboard();
                             }
                         });
                     }
                 });
             }
-            // Show restart button
-            document.getElementById('restart-button').addEventListener('click', function () {
-                init(); // Restart the game
-                gameLoop = setInterval(draw, speed); // Start game loop again
-            });
-
-        }
-
-        // database part
-
-        // Function to save player data
-        function savePlayerData() {
-            const playerName = document.getElementById('playerName').value.trim();
-            const playerScore = score / 20; // Adjust the score calculation based on your game logic
-            if (playerName === '') {
-                alert('Please enter your name.');
-                return;
-            }
-
-            // Get the count of existing players to generate the next player ID
-            docClient.scan({ TableName: 'SnakeLeaderboard' }, function (err, data) {
-                if (err) {
-                    alert("Unable to read data from table", err);
-                    return;
-                }
-
-                const playerId = data.Items.length + 1; // Generate sequential player ID
-
-                const params = {
-                    TableName: 'SnakeLeaderboard',
-                    Item: {
-                        playerId: playerId, // Store player ID as a number
-                        playerName: playerName,
-                        playerScore: playerScore
-                    }
-                };
-
-                docClient.put(params, function (err, data) {
-                    if (err) {
-                        alert("Unable to add item", err);
-                    } else {
-                        alert("Item added successfully", data);
-                        // Refresh leaderboard after adding new player
-                        refreshLeaderboard();
-                    }
-                });
-            });
         }
 
         // Function to refresh leaderboard
@@ -717,24 +706,66 @@
                 const leaderboardList = document.getElementById('leaderboardList');
                 leaderboardList.innerHTML = ''; // Clear previous entries
 
-                // Sort players by score (descending)
-                const players = data.Items.sort((a, b) => b.playerScore - a.playerScore);
+                // Group players by name and keep track of their highest scores
+                const playersMap = {};
+                data.Items.forEach(player => {
+                    if (!playersMap[player.playerName] || player.playerScore > playersMap[player.playerName].playerScore) {
+                        playersMap[player.playerName] = player;
+                    }
+                });
 
-                players.forEach(player => {
+                // Sort the players by score (descending)
+                const sortedPlayers = Object.values(playersMap).sort((a, b) => b.playerScore - a.playerScore).slice(0, 10); // Get top 10 players
+
+                sortedPlayers.forEach(player => {
                     const listItem = document.createElement('li');
                     listItem.textContent = `${player.playerName}: ${player.playerScore}`;
                     leaderboardList.appendChild(listItem);
                 });
+
+                // Check if there are more players
+                const morePlayers = data.Items.length > 10;
+
+                // If there are more players, add a "Show More" button
+                if (morePlayers) {
+                    const showMoreButton = document.createElement('button');
+                    showMoreButton.textContent = 'Show More';
+                    showMoreButton.onclick = function () {
+                        showAllPlayers(data.Items);
+                    };
+                    leaderboardList.appendChild(showMoreButton);
+                }
             });
         }
 
-        function alerts() {
-            if (document.getElementById("playerName").value != "") {
-                window.location.reload(); // Reload the window
-            }
-            else {
-                alert("Please enter the player name before restarting to get your score into leaderboard!!");
-            }
+
+
+        // Function to show all players in the leaderboard
+        function showAllPlayers(players) {
+            const leaderboardList = document.getElementById('leaderboardList');
+            leaderboardList.innerHTML = ''; // Clear previous entries
+
+            // Group players by name and keep track of their highest scores
+            const playersMap = {};
+            players.forEach(player => {
+                if (!playersMap[player.playerName] || player.playerScore > playersMap[player.playerName].playerScore) {
+                    playersMap[player.playerName] = player;
+                }
+            });
+
+            // Sort the players by score (descending)
+            const sortedPlayers = Object.values(playersMap).sort((a, b) => b.playerScore - a.playerScore);
+
+            sortedPlayers.forEach(player => {
+                const listItem = document.createElement('li');
+                listItem.textContent = `${player.playerName}: ${player.playerScore}`;
+                leaderboardList.appendChild(listItem);
+            });
+        }
+
+        function restart() {
+            init(); // Restart the game
+            gameLoop = setInterval(draw, speed); // Start game loop again
         }
 
         // Initial leaderboard refresh
